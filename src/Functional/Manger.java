@@ -7,6 +7,7 @@ import allTasks.Task;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public interface Manger {
 
@@ -33,4 +34,6 @@ public interface Manger {
 
     //пункт 2.7 Удаление одной задач
     public void deleteTask(int id);
+
+    public ArrayList<Task> history();
 }

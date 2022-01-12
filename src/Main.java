@@ -41,6 +41,9 @@ public class Main {
                 case 8:
                     manager.deleteAllTask();
                     break;
+                case 9:
+                    Assistant.printHistory(manager);
+                    break;
                 case 0:
                     return;
                 default:
@@ -61,6 +64,7 @@ public class Main {
         System.out.println("6.Обновить задачу");
         System.out.println("7.Удалить задачу");
         System.out.println("8.Удалить все задачи");
+        System.out.println("9.Посмотреть историю");
         System.out.println("0.Выход");
     }
 }

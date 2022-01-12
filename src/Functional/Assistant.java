@@ -53,7 +53,7 @@ public class Assistant {
         System.out.println(task);
     }
 
-    private static Task CreateCommonTask() {
+    private static Task createCommonTask() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите имя задачи");
         String name = scanner.nextLine();
@@ -70,7 +70,7 @@ public class Assistant {
         return new Task(name,description,status);
     }
 
-    private static EpicTask CreateEpicTask() {
+    private static EpicTask createEpicTask() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите имя задачи");
         String name = scanner.nextLine();
@@ -79,10 +79,15 @@ public class Assistant {
         return new EpicTask(name,description);
     }
 
+    public static void printHistory(Manger manager) {
+        ArrayList<Task> history = manager.history();
+        printTaskList(history);
+    }
+
     /* Мне кажется, не совсем логично передавать manager как параметр, но по-другому я не придумал, как реализовать
     выбор эпика, поэтому я считаю, что это решения данной проблемы*/
 
-    private static SubTask CreateSubtask(Manger manager) {
+    private static SubTask createSubtask(Manger manager) {
         System.out.println("Выберите id эпика задачи");
         Scanner scanner = new Scanner(System.in);
         printEpicTaskList(manager.getEpicTaskList());
@@ -119,11 +124,11 @@ public class Assistant {
         System.out.println("3.Подзадачу");
         switch (scanner.nextInt()) {
             case 1:
-                return CreateCommonTask();
+                return createCommonTask();
             case 2:
-                return CreateEpicTask();
+                return createEpicTask();
             case 3:
-                return CreateSubtask(manager);
+                return createSubtask(manager);
         }
         return null;
     }
