@@ -8,14 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class Manager {
+public class InMemoryTasksManager implements Manger {
     private HashMap<Integer, Task> tasksMap;
 
-    public Manager() {
+    public InMemoryTasksManager() {
         tasksMap = new HashMap<>();
     }
 
     //пункт 2.1 Получение списка всех задач.
+    @Override
     public  ArrayList<Task> getTaskList() {
         ArrayList<Task> listToReturn = new ArrayList<>();
         for(int taskId : tasksMap.keySet()) {
@@ -24,6 +25,7 @@ public class Manager {
         return listToReturn;
     }
 
+    @Override
     //пункт 2.2 Получение списка всех эпиков.
     public  ArrayList<EpicTask> getEpicTaskList() {
         ArrayList<EpicTask> listToReturn = new ArrayList<>();
@@ -35,6 +37,7 @@ public class Manager {
         return listToReturn;
     }
 
+    @Override
     // пункт 2.3 Получение списка всех подзадач определённого эпика.
     public ArrayList<SubTask> getEpicsSubtaskList(int id) {
        if(tasksMap.get(id).getClass() == EpicTask.class) {
@@ -43,19 +46,21 @@ public class Manager {
        return null;
     }
 
+    @Override
     //пункт 2.4 Получение задачи любого типа по идентификатору
     public Task getTaskById(int id) {
         return tasksMap.get(id);
     }
 
+    @Override
     //пункт 2.5 Добавление новой задачи, эпика и подзадачи.
     public void addTask(Task task) {
         task.setId(getFirstEmptyId());
         tasksMap.put(task.getId(),task);
     }
 
+    @Override
     //пункт 2.6 Обновление задачи любого типа по идентификатору. Новая версия объекта передаётся в виде параметра.
-    //Возможно, требуется передавать id объекта и объект, но я не совсем понял, что требует ТЗ, поэтому id уже храниться в Объекте
     public void updateTask(Task task) {
         Task updateTask = tasksMap.get(task.getId());
         if(!task.getName().isEmpty()) updateTask.setName(task.getName());
@@ -66,12 +71,14 @@ public class Manager {
         }
     }
 
+    @Override
     //пункт 2.7 Удаление всех задач
     public void deleteAllTask() {
             tasksMap.clear();
             //да я очистил всё хранилище, но нужно ли как-то удалять сами объекты?
     }
 
+    @Override
     //пункт 2.7 Удаление одной задач
     public void deleteTask(int id) {
         Task task = tasksMap.get(id);
