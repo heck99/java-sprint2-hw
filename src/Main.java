@@ -1,5 +1,6 @@
 import Functional.Assistant;
 import Functional.InMemoryTasksManager;
+import Functional.Managers;
 import Functional.Manger;
 
 import java.util.Scanner;
@@ -11,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Трекер задач запущен. Добро пожаловть! \nВыберете действие!");
         Scanner scanner = new Scanner(System.in);
-        Manger manager = new InMemoryTasksManager();
+        Manger manager = Managers.getDefault();
         while (true) {
             printMenu();
             int command = scanner.nextInt();
