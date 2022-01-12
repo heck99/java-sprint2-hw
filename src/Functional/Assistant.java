@@ -81,7 +81,7 @@ public class Assistant {
 
     public static void printHistory(Manger manager) {
         ArrayList<Task> history = manager.history();
-        printTaskList(history);
+        printAllTaskList(history);
     }
 
     /* Мне кажется, не совсем логично передавать manager как параметр, но по-другому я не придумал, как реализовать
