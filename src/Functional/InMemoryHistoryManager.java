@@ -4,7 +4,6 @@ import allTasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager{
@@ -12,6 +11,10 @@ public class InMemoryHistoryManager implements HistoryManager{
     //если честно мне больше нравится создать отдельный класс для списка, но написано, что делать этого не нужно
     TaskNode tail;
     TaskNode head;
+
+    public InMemoryHistoryManager() {
+        historyMap = new HashMap<>();
+    }
 
     @Override
     public void add(Task task) {
@@ -54,6 +57,7 @@ public class InMemoryHistoryManager implements HistoryManager{
         TaskNode currentNode = head;
         while(currentNode != null) {
            listToReturn.add(currentNode.item);
+           currentNode = currentNode.next;
         }
         return listToReturn;
     }
