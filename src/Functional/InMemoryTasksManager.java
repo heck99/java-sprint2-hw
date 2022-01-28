@@ -90,6 +90,7 @@ public class InMemoryTasksManager implements Manger {
     //пункт 2.7 Удаление одной задач
     public void deleteTask(int id) {
         Task task = tasksMap.get(id);
+        historyManager.remove(id);
         if(task.getClass() == Task.class) tasksMap.remove(id);
         if(task.getClass() == SubTask.class) {
             ((SubTask)task).getEpicTask().deleteSubtask((SubTask)task);
@@ -97,6 +98,7 @@ public class InMemoryTasksManager implements Manger {
         }
         if(task.getClass() == EpicTask.class) {
             for(SubTask taskToDelete : ((EpicTask)task).getSubTasks()) {
+                historyManager.remove(taskToDelete.getId());
                 tasksMap.remove(taskToDelete.getId());
             }
             tasksMap.remove(id);
@@ -115,5 +117,14 @@ public class InMemoryTasksManager implements Manger {
     @Override
     public List<Task> history() {
         return historyManager.getHistory();
+    }
+
+    @Override
+    public EpicTask getEpicById(int id) {
+        Task epic = tasksMap.get(id);
+        if(epic.getClass() == EpicTask.class) {
+            return (EpicTask) epic;
+        }
+        return null;
     }
 }
