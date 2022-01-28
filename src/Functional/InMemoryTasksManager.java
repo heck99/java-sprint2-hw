@@ -82,6 +82,7 @@ public class InMemoryTasksManager implements Manger {
     @Override
     //пункт 2.7 Удаление всех задач
     public void deleteAllTask() {
+        historyManager.clear();
             tasksMap.clear();
             //да я очистил всё хранилище, но нужно ли как-то удалять сами объекты?
     }

@@ -53,6 +53,13 @@ public class InMemoryHistoryManager implements HistoryManager{
             t.next = newNode;
     }
 
+    @Override
+    public void clear() {
+        tail=null;
+        head=null;
+        historyMap.clear();
+    }
+
     private List<Task> getTasks() {
         ArrayList<Task> listToReturn = new ArrayList<>();
         TaskNode currentNode = head;
