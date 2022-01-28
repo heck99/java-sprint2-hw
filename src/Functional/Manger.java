@@ -35,5 +35,5 @@ public interface Manger {
     //пункт 2.7 Удаление одной задач
     public void deleteTask(int id);
 
-    public ArrayList<Task> history();
+    public List<Task> history();
 }

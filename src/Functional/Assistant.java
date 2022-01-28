@@ -3,6 +3,7 @@ package Functional;
 import allTasks.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -80,7 +81,7 @@ public class Assistant {
     }
 
     public static void printHistory(Manger manager) {
-        ArrayList<Task> history = manager.history();
+        List<Task> history = manager.history();
         printAllTaskList(history);
     }
 
@@ -168,7 +169,7 @@ public class Assistant {
         manager.updateTask(taskToUpdate);
     }
 
-    public static void printAllTaskList(ArrayList<Task> taskList) {
+    public static void printAllTaskList(List<Task> taskList) {
         for(Task task : taskList) {
             System.out.println(task);
         }

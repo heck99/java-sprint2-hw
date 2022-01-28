@@ -7,14 +7,19 @@ import allTasks.Task;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTasksManager implements Manger {
     private HashMap<Integer, Task> tasksMap;
-    private ArrayList<Task> history;
+
+    /*возможно стоит объявить менеджера историй в главной программе и передавать в функции в качестве аргумента, но
+    мне кажется, более логичным сделать так, потому что история это часть работы с задачами, и взаимодействие c
+    history manager таким образом мне кажется более логична, чем передача его в метод getTaskById, как параметр*/
+    private HistoryManager historyManager;
 
     public InMemoryTasksManager() {
         tasksMap = new HashMap<>();
-        history = new ArrayList<>();
+        historyManager = new InMemoryHistoryManager();
     }
 
     //пункт 2.1 Получение списка всех задач.
@@ -51,7 +56,7 @@ public class InMemoryTasksManager implements Manger {
     @Override
     //пункт 2.4 Получение задачи любого типа по идентификатору
     public Task getTaskById(int id) {
-        this.addToHistory(tasksMap.get(id));
+        historyManager.add(tasksMap.get(id));
         return tasksMap.get(id);
     }
 
@@ -98,11 +103,6 @@ public class InMemoryTasksManager implements Manger {
         }
     }
 
-    @Override
-    public ArrayList<Task> history() {
-        return history;
-    }
-
     private int getFirstEmptyId() {
         Integer[] keyArr = tasksMap.keySet().toArray(new Integer[0]);
         Arrays.sort(keyArr);
@@ -112,12 +112,8 @@ public class InMemoryTasksManager implements Manger {
         return keyArr.length;
     }
 
-    private void addToHistory(Task taskToAdd) {
-        if(history.size() < 10) {
-            history.add(taskToAdd);
-            return;
-        }
-        history.remove(0);
-        history.add(taskToAdd);
+    @Override
+    public List<Task> history() {
+        return historyManager.getHistory();
     }
 }
