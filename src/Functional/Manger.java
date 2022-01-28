@@ -35,5 +35,8 @@ public interface Manger {
     //пункт 2.7 Удаление одной задач
     public void deleteTask(int id);
 
+    // Получение истории
     public List<Task> history();
+
+    public EpicTask getEpicById(int id);
 }

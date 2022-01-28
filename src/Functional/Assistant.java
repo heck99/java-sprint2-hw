@@ -92,12 +92,12 @@ public class Assistant {
         System.out.println("Выберите id эпика задачи");
         Scanner scanner = new Scanner(System.in);
         printEpicTaskList(manager.getEpicTaskList());
-        Task epicTask = null;
-        epicTask=manager.getTaskById(scanner.nextInt());
+        EpicTask epicTask = null;
+        epicTask=manager.getEpicById(scanner.nextInt());
         scanner.nextLine();
         while(epicTask == null || epicTask.getClass()!=EpicTask.class) {
             System.out.println("Такого id не существует или id неверный\nВведите корректный id");
-            epicTask = manager.getTaskById(scanner.nextInt());
+            epicTask = manager.getEpicById(scanner.nextInt());
             scanner.nextLine();
         }
         System.out.println("Введите имя задачи");
@@ -112,8 +112,8 @@ public class Assistant {
             scanner.nextLine();
         }while (command > 3 || command <= 0);
         Status status = Status.values()[command - 1];
-        SubTask newTask = new SubTask(name, description, status,(EpicTask)epicTask );
-        ((EpicTask) epicTask).addSubtask(newTask);
+        SubTask newTask = new SubTask(name, description, status,epicTask );
+        epicTask.addSubtask(newTask);
         return newTask;
     }
 
