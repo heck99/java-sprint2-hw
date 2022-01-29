@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class InMemoryTasksManager implements Manger {
+public class InMemoryTasksManager implements Manager {
     private HashMap<Integer, Task> tasksMap;
 
     /*возможно стоит объявить менеджера историй в главной программе и передавать в функции в качестве аргумента, но

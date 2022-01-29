@@ -24,7 +24,7 @@ public class Assistant {
         }
     }
 
-    public static void printEpicsSubtasks(Manger manager) {
+    public static void printEpicsSubtasks(Manager manager) {
         System.out.println("Введите id Эпика");
         Scanner scanner = new Scanner(System.in);
         printEpicTaskList(manager.getEpicTaskList());
@@ -39,7 +39,7 @@ public class Assistant {
         printSubtaskList(manager.getEpicsSubtaskList(id));
     }
 
-    public static void printOneTasks(Manger manager) {
+    public static void printOneTasks(Manager manager) {
         System.out.println("Введите id задачи");
         printTaskList(manager.getTaskList());
         Scanner scanner = new Scanner(System.in);
@@ -80,7 +80,7 @@ public class Assistant {
         return new EpicTask(name,description);
     }
 
-    public static void printHistory(Manger manager) {
+    public static void printHistory(Manager manager) {
         List<Task> history = manager.history();
         printAllTaskList(history);
     }
@@ -88,7 +88,7 @@ public class Assistant {
     /* Мне кажется, не совсем логично передавать manager как параметр, но по-другому я не придумал, как реализовать
     выбор эпика, поэтому я считаю, что это решения данной проблемы*/
 
-    private static SubTask createSubtask(Manger manager) {
+    private static SubTask createSubtask(Manager manager) {
         System.out.println("Выберите id эпика задачи");
         Scanner scanner = new Scanner(System.in);
         printEpicTaskList(manager.getEpicTaskList());
@@ -117,7 +117,7 @@ public class Assistant {
         return newTask;
     }
 
-    public static Task createTask(Manger manager) {
+    public static Task createTask(Manager manager) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("какую задачу Вы хотите создать?");
         System.out.println("1.Обычную");
@@ -140,7 +140,7 @@ public class Assistant {
         }
     }
 
-    public static void deleteOneElement(Manger manager) {
+    public static void deleteOneElement(Manager manager) {
         System.out.println("Введите id задачи");
         printTaskList(manager.getTaskList());
         Scanner scanner = new Scanner(System.in);
@@ -149,7 +149,7 @@ public class Assistant {
         manager.deleteTask(id);
     }
 
-    public static void updateInfo(Manger manager) {
+    public static void updateInfo(Manager manager) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Выберите id задачи для обновления");
         printTaskList(manager.getTaskList());

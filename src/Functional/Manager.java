@@ -5,11 +5,9 @@ import allTasks.SubTask;
 import allTasks.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-public interface Manger {
+public interface Manager {
 
     //пункт 2.1 Получение списка всех задач.
     public ArrayList<Task> getTaskList();
