@@ -23,8 +23,6 @@ public class InMemoryHistoryManager implements HistoryManager{
             removeNode(historyMap.get(taskId));
             historyMap.remove(taskId);
         }
-        historyMap.remove(head.item.getId());
-        removeNode(head);
         linkLast(task);
         historyMap.put(tail.item.getId(),tail);
     }
