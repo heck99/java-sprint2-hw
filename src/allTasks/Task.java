@@ -23,6 +23,11 @@ public class Task {
                 ", status=" + status +
                 '}';
     }
+//нужно ли что-то добавлять при перегрузке метода?
+    public String toString(int command) {
+        return String.join(",", String.valueOf(id), TaskType.TASK.toString(),
+                name, status.toString(), description);
+    }
 
     public String getName() {
         return name;

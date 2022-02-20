@@ -21,6 +21,11 @@ public class EpicTask extends Task{
                 '}';
     }
 
+    public String toString(int command) {
+        return String.join(",", String.valueOf(id), TaskType.EPIC.toString(),
+                name, status.toString(), description);
+    }
+
     public ArrayList<SubTask> getSubTasks() {
         return subTasks;
     }
