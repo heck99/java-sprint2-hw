@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTasksManager implements Manager {
-    private HashMap<Integer, Task> tasksMap;
+    protected HashMap<Integer, Task> tasksMap;
 
     /*возможно стоит объявить менеджера историй в главной программе и передавать в функции в качестве аргумента, но
     мне кажется, более логичным сделать так, потому что история это часть работы с задачами, и взаимодействие c
     history manager таким образом мне кажется более логична, чем передача его в метод getTaskById, как параметр*/
-    private HistoryManager historyManager;
+    protected HistoryManager historyManager;
 
     public InMemoryTasksManager() {
         tasksMap = new HashMap<>();

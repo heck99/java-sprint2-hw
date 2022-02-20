@@ -17,6 +17,16 @@ public class InMemoryHistoryManager implements HistoryManager{
     }
 
     @Override
+    public String toString() {
+        String stringToReturn = "";
+        TaskNode iterator = head;
+        while (iterator!=null) {
+            stringToReturn += String.valueOf(iterator.item.getId());
+        }
+        return stringToReturn;
+    }
+
+    @Override
     public void add(Task task) {
         int taskId = task.getId();
         if(historyMap.containsKey(taskId)) {
