@@ -34,7 +34,37 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         } catch (IOException ex) {
 
         }
+
     }
 
+    @Override
+    public void addTask(Task task) {
+        super.addTask(task);
+        save();
+    }
 
+    @Override
+    public Task getTaskById(int id) {
+        Task task = super.getTaskById(id);
+        save();
+        return task;
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void deleteAllTask() {
+        super.deleteAllTask();
+        save();
+    }
+
+    @Override
+    public void deleteTask(int id) {
+        super.deleteTask(id);
+        save();
+    }
 }

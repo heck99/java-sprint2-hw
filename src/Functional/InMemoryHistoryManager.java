@@ -22,6 +22,7 @@ public class InMemoryHistoryManager implements HistoryManager{
         TaskNode iterator = head;
         while (iterator!=null) {
             stringToReturn += String.valueOf(iterator.item.getId());
+            iterator = iterator.next;
         }
         return stringToReturn;
     }
