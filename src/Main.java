@@ -41,8 +41,7 @@ public class Main {
                 case 8:
                     manager.deleteAllTask();
                     break;
-                case 9:
-                    Assistant.printHistory(manager);
+                case 9: Assistant.printHistory(manager);
                     break;
                 case 0:
                     return;

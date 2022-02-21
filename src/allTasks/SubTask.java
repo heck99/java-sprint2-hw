@@ -34,7 +34,7 @@ public class SubTask extends Task {
     }
 
     public String toString(int command) {
-        return String.join(",", String.valueOf(id), TaskType.TASK.toString(),
+        return String.join(",", String.valueOf(id), TaskType.SUBTASK.toString(),
                 name, status.toString(), description, String.valueOf(epicTask.getId()));
     }
 

@@ -3,13 +3,12 @@ package Functional;
 import allTasks.*;
 
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class FileBackedTasksManager extends InMemoryTasksManager{
     String path;
@@ -17,11 +16,9 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
     public FileBackedTasksManager(String path) {
         super();
         this.path = path;
+        loadFromFile();
     }
 
-    public FileBackedTasksManager() {
-        super();
-    }
 
     private void save() {
         //Всегда ли нужно указывать кодировку при создании FileWriter/FileReader
@@ -31,6 +28,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
                 bw.newLine();
                 bw.write(task.toString(1));
             }
+            bw.newLine();
             bw.newLine();
             String str = "";
             for (Task task : history()) {
@@ -42,8 +40,35 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         } catch (IOException ex) {
 
         }
-
     }
+
+    private void historyFromString(String data) {
+        String[] tasksId = data.split(",");
+        for (String id : tasksId) {
+            getTaskById(Integer.parseInt(id));
+        }
+    }
+
+    private void loadFromFile() {
+        try {
+            String data = Files.readString(Path.of(path));
+            String[] strings = data.split("\\r\\n");
+
+            for (int i = 1; i < strings.length; i++) {
+                if(strings[i].isEmpty()) {
+                    historyFromString(strings[strings.length-1]);
+                    break;
+                }
+                super.addTask(fromString((strings[i])));
+            }
+
+        } catch (IOException ex) {
+
+        }
+    }
+
+
+
 
     @Override
     public void addTask(Task task) {
@@ -75,6 +100,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         super.deleteTask(id);
         save();
     }
+
     private Task fromString(String value) {
         String[] fields = value.split(",");
         Task taskToReturn;
