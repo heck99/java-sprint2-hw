@@ -67,6 +67,10 @@ public class InMemoryTasksManager implements Manager {
         tasksMap.put(task.getId(),task);
     }
 
+    protected void addTaskWithoutId(Task task) {
+        tasksMap.put(task.getId(),task);
+    }
+
     @Override
     //пункт 2.6 Обновление задачи любого типа по идентификатору. Новая версия объекта передаётся в виде параметра.
     public void updateTask(Task task) {

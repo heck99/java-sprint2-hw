@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import Exception.ManagerSaveException;
 
 
 public class FileBackedTasksManager extends InMemoryTasksManager{
@@ -38,7 +39,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
                 bw.write(str.substring(0, str.length() - 1));
             }
         } catch (IOException ex) {
-
+            throw new ManagerSaveException();
         }
     }
 
@@ -59,15 +60,13 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
                     historyFromString(strings[strings.length-1]);
                     break;
                 }
-                super.addTask(fromString((strings[i])));
+                super.addTaskWithoutId(fromString((strings[i])));
             }
 
         } catch (IOException ex) {
-
+            throw new ManagerSaveException();
         }
     }
-
-
 
 
     @Override
