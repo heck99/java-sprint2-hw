@@ -22,7 +22,6 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
 
 
     private void save() {
-        //Всегда ли нужно указывать кодировку при создании FileWriter/FileReader
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8))) {
             bw.write(String.join(",","id", "type", "name", "status", "description", "epic"));
             for (Task task :this.getTaskList()) {
@@ -43,14 +42,20 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         }
     }
 
+/*возможно, все методы, которые как либо получают задачу или историю из строки и наоборот нужно вынести в отдельный
+ класс, но мне кажется, что это достаточно узкая задача, в том плане, что работает только для того формата,
+ который задан в файле base.csv и вряд ли каким-либо другим классам понадобиться воспользоваться данными методами,
+поэтому я решил сделать эти методы только для данного класса, потому что они нужны для работы только его самого*/
+
     private void historyFromString(String data) {
         String[] tasksId = data.split(",");
         for (String id : tasksId) {
-            getTaskById(Integer.parseInt(id));
+            super.getTaskById(Integer.parseInt(id));
         }
     }
 
     private void loadFromFile() {
+        if (!Files.exists(Path.of(path))) return;
         try {
             String data = Files.readString(Path.of(path));
             String[] strings = data.split("\\r\\n");
@@ -68,6 +73,28 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         }
     }
 
+    private Task fromString(String value) {
+        String[] fields = value.split(",");
+        Task taskToReturn;
+        switch (TaskType.valueOf(fields[1])) {
+            case TASK:
+                taskToReturn = new Task(fields[2], fields[4], Status.valueOf(fields[3]));
+                taskToReturn.setId(Integer.parseInt(fields[0]));
+                break;
+            case EPIC:
+                taskToReturn = new EpicTask(fields[2], fields[4]);
+                taskToReturn.setId(Integer.parseInt(fields[0]));
+                break;
+            case SUBTASK:
+                taskToReturn = new SubTask(fields[2], fields[4], Status.valueOf(fields[3]),
+                        this.getEpicById(Integer.parseInt(fields[5])));
+                taskToReturn.setId(Integer.parseInt(fields[0]));
+                break;
+            default:
+                return null;
+        }
+        return taskToReturn;
+    }
 
     @Override
     public void addTask(Task task) {
@@ -98,28 +125,5 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
     public void deleteTask(int id) {
         super.deleteTask(id);
         save();
-    }
-
-    private Task fromString(String value) {
-        String[] fields = value.split(",");
-        Task taskToReturn;
-        switch (TaskType.valueOf(fields[1])) {
-            case TASK:
-                taskToReturn = new Task(fields[2], fields[4], Status.valueOf(fields[3]));
-                taskToReturn.setId(Integer.parseInt(fields[0]));
-                break;
-            case EPIC:
-                taskToReturn = new EpicTask(fields[2], fields[4]);
-                taskToReturn.setId(Integer.parseInt(fields[0]));
-                break;
-            case SUBTASK:
-                taskToReturn = new SubTask(fields[2], fields[4], Status.valueOf(fields[3]),
-                        this.getEpicById(Integer.parseInt(fields[5])));
-                taskToReturn.setId(Integer.parseInt(fields[0]));
-                break;
-            default:
-                return null;
-        }
-        return taskToReturn;
     }
 }

@@ -1,7 +1,5 @@
 package allTasks;
 
-import java.util.Scanner;
-
 public class Task {
     protected String name;
     protected String description;

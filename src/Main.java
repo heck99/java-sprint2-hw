@@ -4,8 +4,7 @@ import Functional.Manager;
 
 import java.util.Scanner;
 
-/*Как я понял, для ТЗ не нужно было реализовывать никакого пользовательского интерфейса, но так удобнее делать отладуку
-и программа выглядит хотя бы чуть-чуть законченой*/
+/*Проверял с помощью данного класса, в данный момент getDefault возвращает FileBackedTasksManager*/
 
 public class Main {
     public static void main(String[] args) {
