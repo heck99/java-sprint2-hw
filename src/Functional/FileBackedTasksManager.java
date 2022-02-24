@@ -3,6 +3,7 @@ package Functional;
 import allTasks.*;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -52,6 +53,10 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         for (String id : tasksId) {
             super.getTaskById(Integer.parseInt(id));
         }
+    }
+
+    public static FileBackedTasksManager loadFromFile(File file) {
+        return new FileBackedTasksManager(file.getPath());
     }
 
     private void loadFromFile() {

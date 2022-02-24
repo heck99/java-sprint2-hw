@@ -12,6 +12,10 @@ public class InMemoryHistoryManager implements HistoryManager{
     TaskNode tail;
     TaskNode head;
 
+    public InMemoryHistoryManager() {
+        historyMap = new HashMap<>();
+    }
+
     @Override
     public String toString() {
         String stringToReturn = "";
