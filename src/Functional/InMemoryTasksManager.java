@@ -19,7 +19,7 @@ public class InMemoryTasksManager implements Manager {
 
     public InMemoryTasksManager() {
         tasksMap = new HashMap<>();
-        historyManager = new InMemoryHistoryManager();
+        historyManager = Managers.getDefaultHistory();
     }
 
     //пункт 2.1 Получение списка всех задач.

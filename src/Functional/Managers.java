@@ -2,6 +2,10 @@ package Functional;
 
 public class Managers {
     public static InMemoryTasksManager getDefault() {
-        return new FileBackedTasksManager("base.csv");
+        return new InMemoryTasksManager();
+    }
+
+    public static HistoryManager  getDefaultHistory() {
+        return new InMemoryHistoryManager();
     }
 }
