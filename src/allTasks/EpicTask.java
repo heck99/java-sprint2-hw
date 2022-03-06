@@ -1,23 +1,30 @@
 package allTasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class EpicTask extends Task{
     protected ArrayList<SubTask> subTasks;
 
-    public EpicTask(String name, String description) {
-        super(name,description,Status.NEW);
+
+
+    public EpicTask(String name, String description ) {
+        //не понятно из ТЗ, что делать с временем эпика без подзадач
+        super(name, description,  Status.NEW,  LocalDateTime.now(), Duration.ofMinutes(0));
         subTasks = new ArrayList<>();
     }
 
     @Override
     public String toString() {
         return "EpicTask{" +
-                "subTasks.length=" + subTasks.size() +
+                "subTasks=" + subTasks.size() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
+                ", duration=" + duration +
+                ", startTime=" + startTime.format(DATE_TIME_FORMATTER) +
                 '}';
     }
 
@@ -36,10 +43,34 @@ public class EpicTask extends Task{
 
     public void addSubtask(SubTask subTask) {
         subTasks.add(subTask);
-        this.checkStatus();
     }
 
-    public void checkStatus() {
+    public void updateInfo() {
+        checkStatus();
+        checkTime();
+    }
+
+    private void checkTime() {
+        LocalDateTime startTime;
+        Duration duration = Duration.ofMinutes(0);
+        if(subTasks.size() == 0) {
+            this.duration = duration;
+            this.startTime = LocalDateTime.now();
+            return;
+        }
+        startTime = subTasks.get(0).getStartTime();
+        for (SubTask subTask : subTasks) {
+            if (subTask.getStartTime().isBefore(startTime)) {
+                startTime = subTask.getStartTime();
+            }
+            duration = duration.plus(subTask.getDuration());
+        }
+        this.setDuration(duration);
+        this.setStartTime(startTime);
+    }
+
+
+    private void checkStatus() {
         if(subTasks.size() == 0) {
             this.setStatus(Status.NEW);
             return;

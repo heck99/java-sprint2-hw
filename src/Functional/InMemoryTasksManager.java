@@ -4,13 +4,14 @@ import allTasks.EpicTask;
 import allTasks.SubTask;
 import allTasks.Task;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
+import Exception.TaskAddException;
+
 
 public class InMemoryTasksManager implements Manager {
     private HashMap<Integer, Task> tasksMap;
+    private TreeSet<Task> tasksSet;
 
     /*возможно стоит объявить менеджера историй в главной программе и передавать в функции в качестве аргумента, но
     мне кажется, более логичным сделать так, потому что история это часть работы с задачами, и взаимодействие c
@@ -20,6 +21,7 @@ public class InMemoryTasksManager implements Manager {
     public InMemoryTasksManager() {
         tasksMap = new HashMap<>();
         historyManager = Managers.getDefaultHistory();
+        tasksSet = new TreeSet<>(Task.getTimeComparator());
     }
 
     //пункт 2.1 Получение списка всех задач.
@@ -64,22 +66,48 @@ public class InMemoryTasksManager implements Manager {
     //пункт 2.5 Добавление новой задачи, эпика и подзадачи.
     public void addTask(Task task) {
         task.setId(getFirstEmptyId());
-        tasksMap.put(task.getId(),task);
+        addTaskWithoutId(task);
     }
 
     protected void addTaskWithoutId(Task task) {
+
+        try {
+            canBePlaced(task);
+        } catch (TaskAddException ex) {
+            System.out.println("Задача не была добавлена.\nДанное время уже занято. Измените время или длительность");
+            return;
+        }
         tasksMap.put(task.getId(),task);
+        tasksSet.add(task);
+        if(task.getClass() == SubTask.class) {
+            EpicTask epic = ((SubTask) task).getEpicTask();
+            tasksSet.remove(epic);
+            epic.updateInfo();
+            tasksSet.add(epic);
+       }
     }
 
     @Override
     //пункт 2.6 Обновление задачи любого типа по идентификатору. Новая версия объекта передаётся в виде параметра.
     public void updateTask(Task task) {
         Task updateTask = tasksMap.get(task.getId());
+        tasksSet.remove(updateTask);
+        try {
+            canBePlaced(task);
+        } catch (TaskAddException ex) {
+            System.out.println("Задача не была обновлена.\nДанное время уже занято. Измените время или длительность");
+            tasksSet.add(updateTask);
+            return;
+        }
         if(!task.getName().isEmpty()) updateTask.setName(task.getName());
         if(!task.getDescription().isEmpty()) updateTask.setDescription(task.getDescription());
         updateTask.setStatus(task.getStatus());
+        updateTask.setStartTime(task.getStartTime());
+        updateTask.setDuration(task.getDuration());
+        tasksSet.add(updateTask);
+
         if(updateTask.getClass() == SubTask.class) {
-            ((SubTask)updateTask).getEpicTask().checkStatus();
+            ((SubTask)updateTask).getEpicTask().updateInfo();
         }
     }
 
@@ -87,8 +115,8 @@ public class InMemoryTasksManager implements Manager {
     //пункт 2.7 Удаление всех задач
     public void deleteAllTask() {
         historyManager.clear();
-            tasksMap.clear();
-            //да я очистил всё хранилище, но нужно ли как-то удалять сами объекты?
+        tasksMap.clear();
+        tasksSet.clear();
     }
 
     @Override
@@ -96,9 +124,17 @@ public class InMemoryTasksManager implements Manager {
     public void deleteTask(int id) {
         Task task = tasksMap.get(id);
         historyManager.remove(id);
-        if(task.getClass() == Task.class) tasksMap.remove(id);
+        if(task.getClass() == Task.class) {
+            tasksMap.remove(id);
+            tasksSet.remove(task);
+        }
         if(task.getClass() == SubTask.class) {
-            ((SubTask)task).getEpicTask().deleteSubtask((SubTask)task);
+            tasksSet.remove(task);
+            EpicTask epic = ((SubTask)task).getEpicTask();
+            tasksSet.remove(epic);
+            epic.deleteSubtask((SubTask)task);
+            epic.updateInfo();
+            tasksSet.add(epic);
             tasksMap.remove(id);
         }
         if(task.getClass() == EpicTask.class) {
@@ -132,4 +168,22 @@ public class InMemoryTasksManager implements Manager {
         }
         return null;
     }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(tasksSet);
+    }
+
+    public boolean canBePlaced(Task taskToAdd) throws TaskAddException{
+        List<Task> taskList = getPrioritizedTasks();
+
+        for(Task task : taskList) {
+            if (task.getClass() == EpicTask.class) continue;
+            if(taskToAdd.getStartTime().isBefore(task.getStartTime().plus(task.getDuration()))) {
+                if(task.getStartTime().isBefore(taskToAdd.getStartTime().plus(taskToAdd.getDuration()))) throw new TaskAddException();
+            }
+        }
+        return true;
+    }
+
 }

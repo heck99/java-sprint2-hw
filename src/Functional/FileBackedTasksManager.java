@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import Exception.ManagerSaveException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+import Exception.*;
 
 
 public class FileBackedTasksManager extends InMemoryTasksManager{
@@ -24,7 +27,7 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
 
     private void save() {
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8))) {
-            bw.write(String.join(",","id", "type", "name", "status", "description", "epic"));
+            bw.write(String.join(",","id", "type", "name", "status", "description","startTime", "duration", "epic"));
             for (Task task :this.getTaskList()) {
                 bw.newLine();
                 bw.write(task.toString(1));
@@ -83,7 +86,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
         Task taskToReturn;
         switch (TaskType.valueOf(fields[1])) {
             case TASK:
-                taskToReturn = new Task(fields[2], fields[4], Status.valueOf(fields[3]));
+                taskToReturn = new Task(fields[2], fields[4], Status.valueOf(fields[3]), LocalDateTime.parse(fields[5],
+                        Task.getDATE_TIME_FORMATTER()), Duration.parse(fields[6]));
                 taskToReturn.setId(Integer.parseInt(fields[0]));
                 break;
             case EPIC:
@@ -91,8 +95,8 @@ public class FileBackedTasksManager extends InMemoryTasksManager{
                 taskToReturn.setId(Integer.parseInt(fields[0]));
                 break;
             case SUBTASK:
-                taskToReturn = new SubTask(fields[2], fields[4], Status.valueOf(fields[3]),
-                        this.getEpicById(Integer.parseInt(fields[5])));
+                taskToReturn = new SubTask(fields[2], fields[4], Status.valueOf(fields[3]),  LocalDateTime.parse(fields[5],
+                        Task.getDATE_TIME_FORMATTER()), Duration.parse(fields[6]), this.getEpicById(Integer.parseInt(fields[7])));
                 taskToReturn.setId(Integer.parseInt(fields[0]));
                 break;
             default:

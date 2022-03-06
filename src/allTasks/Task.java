@@ -1,15 +1,62 @@
 package allTasks;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+
 public class Task {
     protected String name;
     protected String description;
     protected int id;
     protected Status status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
+    protected static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy_HH");
 
-    public Task(String name, String description, Status status) {
+    public Task(String name, String description, Status status, LocalDateTime startTime, Duration duration) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public static Comparator<Task> getTimeComparator() {
+        return new Comparator<>() {
+            @Override
+            public int compare(Task o1, Task o2) {
+                LocalDateTime o1Time = o1.getStartTime();
+                LocalDateTime o2Time = o2.getStartTime();
+                if(o1Time.isAfter(o2Time)) return 1;
+                if(o1Time.isBefore(o2Time)) return -1;
+                return Integer.compare(o1.getId(), o2.getId());
+            }
+        };
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+
+
+    public static DateTimeFormatter getDATE_TIME_FORMATTER() {
+        return DATE_TIME_FORMATTER;
     }
 
     @Override
@@ -19,12 +66,15 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", status=" + status +
+                ", duration=" + duration +
+                ", startTime=" + startTime.format(DATE_TIME_FORMATTER) +
                 '}';
     }
-//нужно ли что-то добавлять при перегрузке метода?
+
+    //нужно ли что-то добавлять при перегрузке метода?
     public String toString(int command) {
-        return String.join(",", String.valueOf(id), TaskType.TASK.toString(),
-                name, status.toString(), description);
+        return String.join(",", String.valueOf(id), TaskType.TASK.toString(), name, status.toString(),
+                description, startTime.format(DATE_TIME_FORMATTER), duration.toString());
     }
 
     public String getName() {

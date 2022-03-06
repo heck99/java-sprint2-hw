@@ -42,6 +42,8 @@ public class Main {
                     break;
                 case 9: Assistant.printHistory(manager);
                     break;
+                case 10: Assistant.printAllTaskList(manager.getPrioritizedTasks());
+                    break;
                 case 0:
                     return;
                 default:
@@ -63,6 +65,7 @@ public class Main {
         System.out.println("7.Удалить задачу");
         System.out.println("8.Удалить все задачи");
         System.out.println("9.Посмотреть историю");
+        System.out.println("10.ВЫвести задачи в отсортированном виде");
         System.out.println("0.Выход");
     }
 }

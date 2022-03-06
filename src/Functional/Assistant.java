@@ -2,9 +2,13 @@ package Functional;
 
 import allTasks.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import  Exception.TaskAddException;
 
 
 /*Как я понял, этот класс не требуется для Тз. Он служит только для взаимодействия пользователя
@@ -43,8 +47,7 @@ public class Assistant {
         System.out.println("Введите id задачи");
         printTaskList(manager.getTaskList());
         Scanner scanner = new Scanner(System.in);
-        Task task = null;
-        task = manager.getTaskById(scanner.nextInt());
+        Task task = manager.getTaskById(scanner.nextInt());
         scanner.nextLine();
         while(task == null) {
             System.out.println("Такого id не существует или id неверный\nВведите корректный id");
@@ -68,7 +71,7 @@ public class Assistant {
             scanner.nextLine();
         }while (command > 3 || command <= 0);
         Status status=Status.values()[command - 1];
-        return new Task(name,description,status);
+        return new Task(name, description, status, inputStartDate(), inputDuration());
     }
 
     private static EpicTask createEpicTask() {
@@ -77,7 +80,7 @@ public class Assistant {
         String name = scanner.nextLine();
         System.out.println("Введите описание задачи");
         String description = scanner.nextLine();
-        return new EpicTask(name,description);
+        return new EpicTask(name, description);
     }
 
     public static void printHistory(Manager manager) {
@@ -92,8 +95,7 @@ public class Assistant {
         System.out.println("Выберите id эпика задачи");
         Scanner scanner = new Scanner(System.in);
         printEpicTaskList(manager.getEpicTaskList());
-        EpicTask epicTask = null;
-        epicTask=manager.getEpicById(scanner.nextInt());
+        EpicTask epicTask=manager.getEpicById(scanner.nextInt());
         scanner.nextLine();
         while(epicTask == null || epicTask.getClass()!=EpicTask.class) {
             System.out.println("Такого id не существует или id неверный\nВведите корректный id");
@@ -112,9 +114,19 @@ public class Assistant {
             scanner.nextLine();
         }while (command > 3 || command <= 0);
         Status status = Status.values()[command - 1];
-        SubTask newTask = new SubTask(name, description, status,epicTask );
-        epicTask.addSubtask(newTask);
-        return newTask;
+        return new SubTask(name, description, status, inputStartDate(), inputDuration(), epicTask);
+    }
+
+    private static LocalDateTime inputStartDate() {
+        Scanner scanner =  new Scanner(System.in);
+        System.out.println("Введите дату начала задачи в формате dd.mm.yyyy.hh");
+        return LocalDateTime.parse(scanner.nextLine(),  DateTimeFormatter.ofPattern("dd.MM.yyyy.HH"));
+    }
+
+    private static Duration inputDuration() {
+        Scanner scanner =  new Scanner(System.in);
+        System.out.println("Введите длительность задачи в минутах");
+        return Duration.ofMinutes(scanner.nextInt());
     }
 
     public static Task createTask(Manager manager) {
@@ -164,9 +176,13 @@ public class Assistant {
         int newStatusid = scanner.nextInt();
         Status newStatus = Status.values()[newStatusid-1];
         scanner.nextLine();
-        Task taskToUpdate = new Task(newName,newDescription,newStatus);
+
+
+        Task taskToUpdate = new Task(newName, newDescription, newStatus, inputStartDate(), inputDuration());
         taskToUpdate.setId(id);
         manager.updateTask(taskToUpdate);
+
+
     }
 
     public static void printAllTaskList(List<Task> taskList) {
