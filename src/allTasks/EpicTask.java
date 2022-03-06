@@ -4,11 +4,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+
 public class EpicTask extends Task{
+
     protected ArrayList<SubTask> subTasks;
-
-
-
     public EpicTask(String name, String description ) {
         //не понятно из ТЗ, что делать с временем эпика без подзадач
         super(name, description,  Status.NEW,  LocalDateTime.now(), Duration.ofMinutes(0));
