@@ -126,16 +126,16 @@ class InMemoryTasksManagerTest {
     @Test
     public void shouldReturnEpicTaskListWhenGetNotEmptyManagerWithOthersTasks() {
         Task task = getTask();
-        task.setStartTime(LocalDateTime.of(2022,3,14,0,50,0));
         manager.addTask(task);
         EpicTask epicTask = getEpicTask();
+        epicTask.setStartTime(LocalDateTime.of(2022,3,14,0,50,0));
         manager.addTask(epicTask);
         EpicTask addedEpicTask = getEpicTask();
         addedEpicTask.setStartTime(LocalDateTime.of(2022,3,14,0,50,0));
         addedEpicTask.setId(1);
         assertEquals(manager.getEpicTaskList().size(), 1);
-        if(manager.getTaskList().size() != 1) return;
-        compareEpicTask((EpicTask) manager.getTaskList().get(0), addedEpicTask);
+        if(manager.getEpicTaskList().size() != 1) return;
+        compareEpicTask( manager.getEpicTaskList().get(0), addedEpicTask);
     }
 
     @Test
