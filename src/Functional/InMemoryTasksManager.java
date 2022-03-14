@@ -7,6 +7,7 @@ import allTasks.Task;
 
 import java.util.*;
 import Exception.TaskAddException;
+import Exception.TaskFindException;
 
 
 public class InMemoryTasksManager implements Manager {
@@ -49,16 +50,15 @@ public class InMemoryTasksManager implements Manager {
     @Override
     // пункт 2.3 Получение списка всех подзадач определённого эпика.
     public ArrayList<SubTask> getEpicsSubtaskList(int id) {
-       if(tasksMap.get(id).getClass() == EpicTask.class) {
-           return ((EpicTask)tasksMap.get(id)).getSubTasks();
-       }
-       return null;
+        return getEpicById(id).getSubTasks();
     }
 
     @Override
     //пункт 2.4 Получение задачи любого типа по идентификатору
     public Task getTaskById(int id) {
+        if(!tasksMap.containsKey(id)) throw new TaskFindException("Нет задачи с данным id");
         historyManager.add(tasksMap.get(id));
+
         return tasksMap.get(id);
     }
 
@@ -70,12 +70,10 @@ public class InMemoryTasksManager implements Manager {
     }
 
     protected void addTaskWithoutId(Task task) {
-
         try {
             canBePlaced(task);
         } catch (TaskAddException ex) {
-            System.out.println("Задача не была добавлена.\nДанное время уже занято. Измените время или длительность");
-            return;
+            throw new TaskAddException("Задача не была добавлена.\nДанное время уже занято. Измените время или длительность");
         }
         tasksMap.put(task.getId(),task);
         tasksSet.add(task);
@@ -90,14 +88,15 @@ public class InMemoryTasksManager implements Manager {
     @Override
     //пункт 2.6 Обновление задачи любого типа по идентификатору. Новая версия объекта передаётся в виде параметра.
     public void updateTask(Task task) {
+        if(!tasksMap.containsKey(task.getId())) throw new TaskFindException("Нет задачи с данным id");
         Task updateTask = tasksMap.get(task.getId());
         tasksSet.remove(updateTask);
         try {
             canBePlaced(task);
         } catch (TaskAddException ex) {
-            System.out.println("Задача не была обновлена.\nДанное время уже занято. Измените время или длительность");
             tasksSet.add(updateTask);
-            return;
+            throw new TaskAddException("Задача не была обновлена.\nДанное время уже занято. Измените время или длительность");
+
         }
         if(!task.getName().isEmpty()) updateTask.setName(task.getName());
         if(!task.getDescription().isEmpty()) updateTask.setDescription(task.getDescription());
@@ -122,6 +121,7 @@ public class InMemoryTasksManager implements Manager {
     @Override
     //пункт 2.7 Удаление одной задач
     public void deleteTask(int id) {
+        if(!tasksMap.containsKey(id)) throw new TaskFindException("Нет задачи с данным id");
         Task task = tasksMap.get(id);
         historyManager.remove(id);
         if(task.getClass() == Task.class) {
@@ -162,11 +162,13 @@ public class InMemoryTasksManager implements Manager {
 
     @Override
     public EpicTask getEpicById(int id) {
+        if(!tasksMap.containsKey(id)) throw new TaskFindException("Нет задачи с данным id");
+
         Task epic = tasksMap.get(id);
         if(epic.getClass() == EpicTask.class) {
             return (EpicTask) epic;
         }
-        return null;
+        throw new TaskFindException("Данная задача не является эпиком");
     }
 
     @Override
@@ -174,9 +176,9 @@ public class InMemoryTasksManager implements Manager {
         return new ArrayList<>(tasksSet);
     }
 
-    public boolean canBePlaced(Task taskToAdd) throws TaskAddException{
+    private boolean canBePlaced(Task taskToAdd) throws TaskAddException{
         List<Task> taskList = getPrioritizedTasks();
-
+        if(taskToAdd.getClass() == EpicTask.class) return true;
         for(Task task : taskList) {
             if (task.getClass() == EpicTask.class) continue;
             if(taskToAdd.getStartTime().isBefore(task.getStartTime().plus(task.getDuration()))) {

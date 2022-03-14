@@ -1,5 +1,6 @@
 package Functional;
 
+
 import allTasks.Status;
 import allTasks.Task;
 import org.junit.jupiter.api.Assertions;
@@ -8,6 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+
+import static Functional.TaskWorker.getTask;
+import static Functional.TaskWorker.compareTask;
 
 //покрыт весь код за исключением метода toString
 class HistoryManagerTest {
@@ -155,21 +159,6 @@ class HistoryManagerTest {
         if(manager.getHistory().size() == 1) {
             compareTask(manager.getHistory().get(0), getTask());
         }
-    }
-
-
-    private Task getTask() {
-        return new Task("name", "description", Status.IN_PROGRESS,
-                LocalDateTime.of(2022, 3, 12, 22, 24), Duration.ofMinutes(10));
-    }
-
-    private void compareTask(Task one, Task two) {
-        Assertions.assertEquals(one.getId(), two.getId());
-        Assertions.assertEquals(one.getStartTime(), two.getStartTime());
-        Assertions.assertEquals(one.getDuration(), two.getDuration());
-        Assertions.assertEquals(one.getName(), two.getName());
-        Assertions.assertEquals(one.getDescription(), two.getDescription());
-        Assertions.assertEquals(one.getStatus(), two.getStatus());
     }
 
 
