@@ -3,15 +3,12 @@ package Functional;
 import allTasks.EpicTask;
 import allTasks.SubTask;
 import allTasks.Task;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import Exception.*;
 
-import org.junit.jupiter.api.function.Executable;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

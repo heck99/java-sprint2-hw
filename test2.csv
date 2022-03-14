@@ -1,0 +1,6 @@
+id,type,name,status,description,startTime,duration,epic
+0,TASK,t1,IN_PROGRESS,dt1,07.03.2022_14,PT1H
+1,EPIC,э1,IN_PROGRESS,de1
+2,SUBTASK,s1,IN_PROGRESS,ds1,07.03.2022_20,PT6H40M,1
+
+1,2,0
