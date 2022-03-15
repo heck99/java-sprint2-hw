@@ -1,5 +1,7 @@
-package Functional;
+package FunctionalTest;
 
+import Functional.FileBackedTasksManager;
+import Functional.Manager;
 import allTasks.EpicTask;
 import allTasks.Status;
 import allTasks.SubTask;

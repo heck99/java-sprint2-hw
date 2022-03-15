@@ -1,6 +1,8 @@
-package Functional;
+package FunctionalTest;
 
 
+import Functional.HistoryManager;
+import Functional.InMemoryHistoryManager;
 import allTasks.Status;
 import allTasks.Task;
 import org.junit.jupiter.api.Assertions;

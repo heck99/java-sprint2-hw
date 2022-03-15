@@ -1,5 +1,7 @@
-package Functional;
+package FunctionalTest;
 
+import Functional.InMemoryTasksManager;
+import Functional.Manager;
 import allTasks.EpicTask;
 import allTasks.SubTask;
 import allTasks.Task;

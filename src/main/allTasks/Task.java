@@ -1,7 +1,5 @@
 package allTasks;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,15 +31,12 @@ public class Task {
     }
 
     public static Comparator<Task> getTimeComparator() {
-        return new Comparator<>() {
-            @Override
-            public int compare(Task o1, Task o2) {
-                LocalDateTime o1Time = o1.getStartTime();
-                LocalDateTime o2Time = o2.getStartTime();
-                if(o1Time.isAfter(o2Time)) return 1;
-                if(o1Time.isBefore(o2Time)) return -1;
-                return Integer.compare(o1.getId(), o2.getId());
-            }
+        return (o1, o2) -> {
+            LocalDateTime o1Time = o1.getStartTime();
+            LocalDateTime o2Time = o2.getStartTime();
+            if(o1Time.isAfter(o2Time)) return 1;
+            if(o1Time.isBefore(o2Time)) return -1;
+            return Integer.compare(o1.getId(), o2.getId());
         };
     }
 

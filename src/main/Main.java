@@ -1,7 +1,6 @@
 import Functional.*;
 
 import java.io.File;
-import java.lang.management.GarbageCollectorMXBean;
 import java.util.Scanner;
 
 /*Проверял с помощью данного класса, в данный момент getDefault возвращает FileBackedTasksManager*/
