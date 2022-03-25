@@ -174,8 +174,6 @@ public class Assistant {
         int newStatusid = scanner.nextInt();
         Status newStatus = Status.values()[newStatusid-1];
         scanner.nextLine();
-
-
         Task taskToUpdate = new Task(newName, newDescription, newStatus, inputStartDate(), inputDuration());
         taskToUpdate.setId(id);
         manager.updateTask(taskToUpdate);

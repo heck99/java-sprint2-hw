@@ -1,4 +1,6 @@
 import Functional.*;
+import allTasks.SubTask;
+import allTasks.Task;
 
 import java.io.File;
 import java.util.Scanner;
