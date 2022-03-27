@@ -1,5 +1,8 @@
-package Functional;
+package Functional.InMemory;
 
+import Functional.Assistance.HistoryManager;
+import Functional.Assistance.Manager;
+import Functional.Assistance.Managers;
 import allTasks.EpicTask;
 import allTasks.SubTask;
 import allTasks.Task;

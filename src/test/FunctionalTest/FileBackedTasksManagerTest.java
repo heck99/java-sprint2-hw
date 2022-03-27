@@ -1,7 +1,7 @@
 package FunctionalTest;
 
-import Functional.FileBackedTasksManager;
-import Functional.Manager;
+import Functional.InFile.FileBackedTasksManager;
+import Functional.Assistance.Manager;
 import allTasks.EpicTask;
 import allTasks.Status;
 import allTasks.SubTask;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static Functional.TaskWorker.*;
+import static Helpers.TaskWorker.*;
 
 class FileBackedTasksManagerTest {
     Manager manager;

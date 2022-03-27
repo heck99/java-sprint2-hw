@@ -1,6 +1,6 @@
-import Functional.*;
-import allTasks.SubTask;
-import allTasks.Task;
+import Functional.Assistance.Assistant;
+import Functional.Assistance.Manager;
+import Functional.InFile.FileBackedTasksManager;
 
 import java.io.File;
 import java.util.Scanner;

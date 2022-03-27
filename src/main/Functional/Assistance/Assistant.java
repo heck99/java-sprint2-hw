@@ -1,4 +1,4 @@
-package Functional;
+package Functional.Assistance;
 
 import allTasks.*;
 

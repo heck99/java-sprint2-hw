@@ -1,5 +1,6 @@
-package Functional;
+package Functional.InFile;
 
+import Functional.InMemory.InMemoryTasksManager;
 import allTasks.*;
 
 import java.io.BufferedWriter;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 import Exception.*;
 
 
-public class FileBackedTasksManager extends InMemoryTasksManager{
+public class FileBackedTasksManager extends InMemoryTasksManager {
     String path;
 
     public FileBackedTasksManager(String path) {

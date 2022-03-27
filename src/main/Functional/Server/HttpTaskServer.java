@@ -1,5 +1,7 @@
-package Functional;
+package Functional.Server;
 
+import Functional.InFile.FileBackedTasksManager;
+import Functional.Assistance.Manager;
 import JsonAddapters.*;
 import allTasks.*;
 import com.google.gson.*;

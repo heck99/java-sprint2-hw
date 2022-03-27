@@ -1,12 +1,13 @@
-package Functional;
+package Functional.InMemory;
 
+import Functional.Assistance.HistoryManager;
 import allTasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
     HashMap<Integer, TaskNode> historyMap;
     //если честно мне больше нравится создать отдельный класс для списка, но написано, что делать этого не нужно
     TaskNode tail;

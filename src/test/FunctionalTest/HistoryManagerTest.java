@@ -1,8 +1,8 @@
 package FunctionalTest;
 
 
-import Functional.HistoryManager;
-import Functional.InMemoryHistoryManager;
+import Functional.Assistance.HistoryManager;
+import Functional.InMemory.InMemoryHistoryManager;
 import allTasks.Status;
 import allTasks.Task;
 import org.junit.jupiter.api.Assertions;
@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static Functional.TaskWorker.getTask;
-import static Functional.TaskWorker.compareTask;
+import static Helpers.TaskWorker.getTask;
+import static Helpers.TaskWorker.compareTask;
 
 //покрыт весь код за исключением метода toString
 class HistoryManagerTest {

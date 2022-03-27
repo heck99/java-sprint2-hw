@@ -1,7 +1,7 @@
 package FunctionalTest;
 
-import Functional.InMemoryTasksManager;
-import Functional.Manager;
+import Functional.InMemory.InMemoryTasksManager;
+import Functional.Assistance.Manager;
 import allTasks.EpicTask;
 import allTasks.SubTask;
 import allTasks.Task;
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static Functional.TaskWorker.*;
+import static Helpers.TaskWorker.*;
 
 class InMemoryTasksManagerTest {
 
