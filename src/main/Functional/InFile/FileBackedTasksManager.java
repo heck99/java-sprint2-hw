@@ -17,7 +17,7 @@ import Exception.*;
 
 
 public class FileBackedTasksManager extends InMemoryTasksManager {
-    String path;
+    private String path;
 
     public FileBackedTasksManager(String path) {
         super();
@@ -25,8 +25,12 @@ public class FileBackedTasksManager extends InMemoryTasksManager {
         loadFromFile();
     }
 
+    public FileBackedTasksManager() {
+        super();
+    }
 
-    private void save() {
+
+    protected void save() {
         try(BufferedWriter bw = new BufferedWriter(new FileWriter(path, StandardCharsets.UTF_8))) {
             bw.write(String.join(",","id", "type", "name", "status", "description","startTime", "duration", "epic"));
             for (Task task :this.getTaskList()) {

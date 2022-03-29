@@ -40,6 +40,7 @@ public class SubtaskAdapter extends TypeAdapter<SubTask> {
         String description = "";
         LocalDateTime startTime = null;
         Duration duration = null;
+        int epicID = -1;
         Status status = Status.IN_PROGRESS;
         while (jsonReader.hasNext()) {
             String field = jsonReader.nextName();
@@ -53,12 +54,14 @@ public class SubtaskAdapter extends TypeAdapter<SubTask> {
                 duration = Duration.ofMinutes(jsonReader.nextLong());
             } else if (field.equals("status")) {
                 status = Status.valueOf(jsonReader.nextString());
+            } else if (field.equals("epicId")) {
+                epicID = jsonReader.nextInt();
             } else {
                 jsonReader.skipValue();
             }
         }
         jsonReader.endObject();
         EpicTask epic = new EpicTask("","");
-        return new SubTask(name,description, status, startTime, duration, epic);
+        return new SubTask(name,description, status, startTime, duration, epicID);
     }
 }

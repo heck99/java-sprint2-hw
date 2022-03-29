@@ -33,7 +33,7 @@ public class KVTaskClient {
         HttpClient client = HttpClient.newHttpClient();
 
         // получаем ответ в формате XML с помощью заголовка
-        URI urlSave = URI.create(url + "/save" + key + "?API_KEY=" + API_KEY);
+        URI urlSave = URI.create(url + "/save/" + key + "?API_KEY=" + API_KEY);
         // сообщаем серверу, что готовы принять ответ в формате XML
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(urlSave)
@@ -52,8 +52,7 @@ public class KVTaskClient {
 
     String load(String key) {
         HttpClient client = HttpClient.newHttpClient();
-        // получаем ответ в формате XML с помощью заголовка
-        URI urlSave = URI.create(url + "/load" + key + "?API_KEY=" + API_KEY);
+        URI urlSave = URI.create(url + "/load/" + key + "?API_KEY=" + API_KEY);
         // сообщаем серверу, что готовы принять ответ в формате XML
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(urlSave)

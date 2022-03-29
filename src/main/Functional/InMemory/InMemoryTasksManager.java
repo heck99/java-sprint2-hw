@@ -14,8 +14,8 @@ import Exception.TaskFindException;
 
 
 public class InMemoryTasksManager implements Manager {
-    private HashMap<Integer, Task> tasksMap;
-    private TreeSet<Task> tasksSet;
+    protected HashMap<Integer, Task> tasksMap;
+    protected TreeSet<Task> tasksSet;
 
     /*возможно стоит объявить менеджера историй в главной программе и передавать в функции в качестве аргумента, но
     мне кажется, более логичным сделать так, потому что история это часть работы с задачами, и взаимодействие c

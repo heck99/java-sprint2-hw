@@ -85,7 +85,9 @@ public class KVServer {
                             h.sendResponseHeaders(400, 0);
                             return;
                         }
-                        sendText(h, data.get(key));
+                        String outLine;
+                        outLine = data.getOrDefault(key, "");
+                        sendText(h, outLine);
                         System.out.println("Значение для ключа " + key + " успешно отправлено!");
                         h.sendResponseHeaders(200, 0);
                         break;

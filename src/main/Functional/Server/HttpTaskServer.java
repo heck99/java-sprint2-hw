@@ -1,6 +1,6 @@
 package Functional.Server;
 
-import Functional.InFile.FileBackedTasksManager;
+import Functional.Assistance.Managers;
 import Functional.Assistance.Manager;
 import JsonAddapters.*;
 import allTasks.*;
@@ -10,7 +10,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
@@ -32,7 +31,7 @@ public class HttpTaskServer {
 
 
     public static void main(String[] args) throws IOException {
-        manager = FileBackedTasksManager.loadFromFile(new File("base.csv"));
+        manager = Managers.getDefault();
         HttpServer httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler());
@@ -54,17 +53,21 @@ public class HttpTaskServer {
             headers.set("Content-Type", "application/json");
             switch(method) {
                 case "POST":
+
                     response = getResponsePostTask(manager, new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET), getType(fields[2]));
+                    setStatus(httpExchange, response);
                     break;
                 case "GET":
                     //запрос на получение списка всех задач
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() == null && types.contains(fields[2])) {
                         response = getResponseGetTaskList(manager);
+                        setStatus(httpExchange, response);
                     }
                     //запрос на получение задачи по id сразу 3 endpoint для всех типов завач
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
                         String id = httpExchange.getRequestURI().getQuery();
                         response = getResponseGetTaskById(manager, Integer.parseInt(id.split("=")[1]), getType(fields[2]));
+                        setStatus(httpExchange, response);
                     }
                     //запрос на получение сабтаски эпика по id эпика
                     if(fields.length == 4 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
@@ -72,14 +75,17 @@ public class HttpTaskServer {
                         if(!fields[2].equals(types.get(2))) break;
                         if (!fields[3].equals(types.get(0)) ) break;
                         response = getResponseGetEpicsSubtaskList(manager, Integer.parseInt(id.split("=")[1]));
+                        setStatus(httpExchange, response);
                     }
                     //запрос на получение истории
                     if(fields.length == 3 && fields[2].equals("history")) {
                         response = getResponseGetHistory(manager);
+                        setStatus(httpExchange, response);
                     }
                     //запрос на получение истории
                     if(fields.length == 2) {
                         response = getResponseGetPrioritizedTasks(manager);
+                        setStatus(httpExchange, response);
                     }
                     break;
 
@@ -88,26 +94,26 @@ public class HttpTaskServer {
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() == null && types.contains(fields[2])) {
                         manager.deleteAllTask();
                         response = "Все задачи удалены";
+                        setStatus(httpExchange, response);
                     }
                     System.out.println("тут");
                     //запрос на удаление задачи по id
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
                         String id = httpExchange.getRequestURI().getQuery();
                         response = getResponseDeleteTaskById(manager, Integer.parseInt(id.split("=")[1]), getType(fields[2]));
+                        setStatus(httpExchange, response);
                     }
 
                     break;
                 default:
-                    response = "Вы использовали какой-то другой метод!";
+                    setStatus(httpExchange, null);
             }
-
-            httpExchange.sendResponseHeaders(200, 0);
 
             try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(response.getBytes());
+                if(response != null) {
+                    os.write(response.getBytes());
+                }
             }
-
-
         }
 
         private String getResponseGetTaskList(Manager manager) {
@@ -120,10 +126,18 @@ public class HttpTaskServer {
             return gson.toJson(list);
         }
 
+        private void setStatus(HttpExchange httpExchange, String response) throws IOException {
+            if(response != null) {
+                httpExchange.sendResponseHeaders(200, 0);
+            } else {
+                httpExchange.sendResponseHeaders(403, 0);
+            }
+        }
+
         private String getResponseGetTaskById(Manager manager, int id, Type type) {
             try {
                 Task task = manager.getTaskById(id);
-                if(task.getClass() != type) return "Задачи данного типа с таким id не существует";
+                if(task.getClass() != type) return null;
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
                 gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
@@ -131,14 +145,14 @@ public class HttpTaskServer {
                 Gson gson = gsonBuilder.create();
                 return gson.toJson(task);
             } catch (TaskFindException exception) {
-                return "this id doesn't exists";
+                return null;
             }
         }
 
         private String getResponseGetEpicsSubtaskList(Manager manager, int id) {
             try {
                 Task task = manager.getTaskById(id);
-                if(task.getClass() != EpicTask.class) return "задача с данным id не является эпиком";
+                if(task.getClass() != EpicTask.class) return null;
                 ArrayList<SubTask> list = manager.getEpicsSubtaskList(id);
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
@@ -147,7 +161,7 @@ public class HttpTaskServer {
                 Gson gson = gsonBuilder.create();
                 return gson.toJson(list);
             } catch (TaskFindException exception) {
-                return "this id doesn't exists";
+                return null;
             }
 
         }
@@ -175,7 +189,7 @@ public class HttpTaskServer {
         private String getResponseDeleteTaskById(Manager manager, int id, Type type) {
             try {
                 Task task = manager.getTaskById(id);
-                if(task.getClass() != type) return "Задачи данного типа с таким id не существует";
+                if(task.getClass() != type) return null;
                 GsonBuilder gsonBuilder = new GsonBuilder();
                 gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
                 gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
@@ -185,7 +199,7 @@ public class HttpTaskServer {
                 //вернём удалнную задачу
                 return gson.toJson(task);
             } catch (TaskFindException exception) {
-                return "this id doesn't exists";
+                return null;
             }
         }
 
@@ -200,31 +214,32 @@ public class HttpTaskServer {
             Gson gson = gsonBuilder.create();
             if(jsonObject.keySet().contains("id")) {
                 int id = jsonObject.get("id").getAsInt();
-                if (type != manager.getTaskById(id).getClass()) return "Задачи данного типа с таким id не существует";
+                if (type != manager.getTaskById(id).getClass()) return null;
                 Task task = gson.fromJson(body, Task.class);
                 task.setId(id);
                 manager.updateTask(task);
-                return "задача изменена";
+                //вернём изменённую задачу
+                return gson.toJson(task);
             } else {
                 if (Task.class.equals(type)) {
                     Task task = gson.fromJson(body, Task.class);
                     manager.addTask(task);
-                    return "задача добавлена";
+                    //вернём добавленную задачу
+                    return gson.toJson(task);
                 } else if(SubTask.class.equals(type)) {
                     SubTask task = gson.fromJson(body, SubTask.class);
-                     int epicId =   jsonObject.get("epicId").getAsInt();
-                    task.setEpicTask(manager.getEpicById(epicId));
+                    task.setEpicTask(manager.getEpicById(task.getEpicId()));
                     manager.addTask(task);
-                    return "задача добавлена";
+                    //вернём добавленную задачу
+                    return gson.toJson(task);
                 } else if(EpicTask.class.equals(type)) {
                     EpicTask task = gson.fromJson(body, EpicTask.class);
                     manager.addTask(task);
-                    return "задача добавлена";
+                    //вернём добавленную задачу
+                    return gson.toJson(task);
                 }
             }
-
-
-            return "so";
+            return null;
         }
 
 

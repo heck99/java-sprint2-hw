@@ -1,17 +1,21 @@
 import Functional.Assistance.Assistant;
 import Functional.Assistance.Manager;
-import Functional.InFile.FileBackedTasksManager;
+import Functional.Server.HTTPTaskManager;
+import Functional.Server.KVServer;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
-/*Проверял с помощью данного класса, в данный момент getDefault возвращает FileBackedTasksManager*/
+/*Для проверки я запускал KVServer из другого приложения, чтобы можно было удобно проверить, как мэнеджер загружает себя
+* с сервера, но по ТЗ, сказано, чтобы запуск KVServer был тут, что делает  не удобным именно мою реализацию проверки,
+* потому что нельзя перезапустить менеджера без перезапуска сервера, но пусть он будет тут для ТЗ*/
 
 public class Main {
-    public static void main(String[] args) {
-        System.out.println("Трекер задач запущен. Добро пожаловть! \nВыберете действие!");
+    public static void main(String[] args)  throws IOException {
         Scanner scanner = new Scanner(System.in);
-        Manager manager = FileBackedTasksManager.loadFromFile(new File("base.csv"));
+        new KVServer().start();
+        Manager manager = new HTTPTaskManager("http://localhost:8078");
+        System.out.println("Трекер задач запущен. Добро пожаловть! \nВыберете действие!");
         while (true) {
             printMenu();
             int command = scanner.nextInt();
