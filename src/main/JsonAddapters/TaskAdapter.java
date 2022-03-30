@@ -16,11 +16,20 @@ import java.time.LocalDateTime;
 public class TaskAdapter extends TypeAdapter<Task> {
     @Override
     public void write(JsonWriter jsonWriter, Task task) throws IOException {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-        Gson gson = gsonBuilder.create();
-        jsonWriter.value(gson.toJson(task));
+        jsonWriter.beginObject();
+        jsonWriter.name("id");
+        jsonWriter.value(task.getId());
+        jsonWriter.name("name");
+        jsonWriter.value(task.getName());
+        jsonWriter.name("description");
+        jsonWriter.value(task.getDescription());
+        jsonWriter.name("status");
+        jsonWriter.value(task.getStatus().toString());
+        jsonWriter.name("startTime");
+        jsonWriter.value(task.getStartTime().format(Task.getDATE_TIME_FORMATTER()));
+        jsonWriter.name("duration");
+        jsonWriter.value(task.getDuration().toMinutes());
+        jsonWriter.endObject();
     }
 
     @Override
@@ -30,7 +39,7 @@ public class TaskAdapter extends TypeAdapter<Task> {
         String description = "";
         LocalDateTime startTime = null;
         Duration duration = null;
-        Status status = Status.IN_PROGRESS;
+        Status status = Status.NEW;
         while (jsonReader.hasNext()) {
             String field = jsonReader.nextName();
             if (field.equals("name")) {

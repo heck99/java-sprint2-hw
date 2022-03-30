@@ -95,17 +95,23 @@ public class InMemoryTasksManager implements Manager {
         Task updateTask = tasksMap.get(task.getId());
         tasksSet.remove(updateTask);
         try {
-            canBePlaced(task);
+            if(!updateTask.getClass().equals(EpicTask.class)) {
+                canBePlaced(task);
+            }
         } catch (TaskAddException ex) {
             tasksSet.add(updateTask);
             throw new TaskAddException("Задача не была обновлена.\nДанное время уже занято. Измените время или длительность");
-
         }
         if(!task.getName().isEmpty()) updateTask.setName(task.getName());
         if(!task.getDescription().isEmpty()) updateTask.setDescription(task.getDescription());
         updateTask.setStatus(task.getStatus());
-        updateTask.setStartTime(task.getStartTime());
-        updateTask.setDuration(task.getDuration());
+        if(task.getDuration() != null) {
+            updateTask.setDuration(task.getDuration());
+        }
+        if(task.getStartTime() != null) {
+            updateTask.setStartTime(task.getStartTime());
+        }
+
         tasksSet.add(updateTask);
 
         if(updateTask.getClass() == SubTask.class) {

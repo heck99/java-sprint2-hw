@@ -28,14 +28,32 @@ public class HttpTaskServer {
     private static final int PORT = 8080;
     private static Manager manager;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    private static  HttpServer httpServer;
+    private static  Gson gson;
 
 
     public static void main(String[] args) throws IOException {
         manager = Managers.getDefault();
-        HttpServer httpServer = HttpServer.create();
+        httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler());
         httpServer.start();
+        gson = new GsonBuilder().registerTypeAdapter(Task.class, new TaskAdapter()). registerTypeAdapter(SubTask.class,
+                new SubtaskAdapter()).registerTypeAdapter(EpicTask.class, new EpicAdapter()).create();
+    }
+
+    public HttpTaskServer() throws IOException {
+        manager = Managers.getDefault();
+        httpServer = HttpServer.create();
+        httpServer.bind(new InetSocketAddress(PORT), 0);
+        httpServer.createContext("/tasks", new TaskHandler());
+        httpServer.start();
+        gson = new GsonBuilder().registerTypeAdapter(Task.class, new TaskAdapter()). registerTypeAdapter(SubTask.class,
+                new SubtaskAdapter()).registerTypeAdapter(EpicTask.class, new EpicAdapter()).create();
+    }
+
+    public void stop() {
+        httpServer.stop(0);
     }
 
     private static class TaskHandler implements HttpHandler {
@@ -54,21 +72,25 @@ public class HttpTaskServer {
             switch(method) {
                 case "POST":
 
-                    response = getResponsePostTask(manager, new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET), getType(fields[2]));
+                    response = getResponsePostTask(manager, new String(httpExchange.getRequestBody().readAllBytes(),
+                            DEFAULT_CHARSET), getType(fields[2]));
                     setStatus(httpExchange, response);
                     break;
                 case "GET":
-                    //запрос на получение списка всех задач
+                    /*запрос на получение списка всех задач
+                    не уверен, что правильно понял, но в данный момен у меня можно получить список всех задач по 3ёмэндпоинтам:
+                    http://loclgost:8080/tasks/task
+                    http://loclgost:8080/tasks/epic
+                    http://loclgost:8080/tasks/subtasks*/
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() == null && types.contains(fields[2])) {
                         response = getResponseGetTaskList(manager);
                         setStatus(httpExchange, response);
-                    }
-                    //запрос на получение задачи по id сразу 3 endpoint для всех типов завач
-                    if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
+                    } else if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
+                        //запрос на получение задачи по id сразу 3 endpoint для всех типов завач
                         String id = httpExchange.getRequestURI().getQuery();
                         response = getResponseGetTaskById(manager, Integer.parseInt(id.split("=")[1]), getType(fields[2]));
                         setStatus(httpExchange, response);
-                    }
+                    } else
                     //запрос на получение сабтаски эпика по id эпика
                     if(fields.length == 4 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
                         String id = httpExchange.getRequestURI().getQuery();
@@ -76,16 +98,18 @@ public class HttpTaskServer {
                         if (!fields[3].equals(types.get(0)) ) break;
                         response = getResponseGetEpicsSubtaskList(manager, Integer.parseInt(id.split("=")[1]));
                         setStatus(httpExchange, response);
-                    }
+                    } else
                     //запрос на получение истории
                     if(fields.length == 3 && fields[2].equals("history")) {
                         response = getResponseGetHistory(manager);
                         setStatus(httpExchange, response);
-                    }
-                    //запрос на получение истории
+                    } else
+                    //запрос на получение  упорядоченого списка задач
                     if(fields.length == 2) {
                         response = getResponseGetPrioritizedTasks(manager);
                         setStatus(httpExchange, response);
+                    } else {
+                       setStatus(httpExchange, null);
                     }
                     break;
 
@@ -96,7 +120,6 @@ public class HttpTaskServer {
                         response = "Все задачи удалены";
                         setStatus(httpExchange, response);
                     }
-                    System.out.println("тут");
                     //запрос на удаление задачи по id
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
                         String id = httpExchange.getRequestURI().getQuery();
@@ -118,11 +141,6 @@ public class HttpTaskServer {
 
         private String getResponseGetTaskList(Manager manager) {
             List<Task> list = manager.getTaskList();
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-            gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-            gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-            Gson gson = gsonBuilder.create();
             return gson.toJson(list);
         }
 
@@ -130,7 +148,7 @@ public class HttpTaskServer {
             if(response != null) {
                 httpExchange.sendResponseHeaders(200, 0);
             } else {
-                httpExchange.sendResponseHeaders(403, 0);
+                httpExchange.sendResponseHeaders(404, 0);
             }
         }
 
@@ -138,11 +156,6 @@ public class HttpTaskServer {
             try {
                 Task task = manager.getTaskById(id);
                 if(task.getClass() != type) return null;
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-                gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-                gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-                Gson gson = gsonBuilder.create();
                 return gson.toJson(task);
             } catch (TaskFindException exception) {
                 return null;
@@ -154,11 +167,6 @@ public class HttpTaskServer {
                 Task task = manager.getTaskById(id);
                 if(task.getClass() != EpicTask.class) return null;
                 ArrayList<SubTask> list = manager.getEpicsSubtaskList(id);
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-                gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-                gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-                Gson gson = gsonBuilder.create();
                 return gson.toJson(list);
             } catch (TaskFindException exception) {
                 return null;
@@ -168,21 +176,11 @@ public class HttpTaskServer {
 
         private String getResponseGetHistory(Manager manager) {
             List<Task> list = manager.history();
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-            gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-            gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-            Gson gson = gsonBuilder.create();
             return gson.toJson(list);
         }
 
         private String getResponseGetPrioritizedTasks(Manager manager) {
             List<Task> list = manager.getPrioritizedTasks();
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-            gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-            gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-            Gson gson = gsonBuilder.create();
             return gson.toJson(list);
         }
 
@@ -190,11 +188,6 @@ public class HttpTaskServer {
             try {
                 Task task = manager.getTaskById(id);
                 if(task.getClass() != type) return null;
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-                gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
-                gsonBuilder.registerTypeAdapter(LocalDateTime.class, new DateFormatter());
-                Gson gson = gsonBuilder.create();
                 manager.deleteTask(id);
                 //вернём удалнную задачу
                 return gson.toJson(task);
@@ -204,22 +197,16 @@ public class HttpTaskServer {
         }
 
         private String getResponsePostTask(Manager manager, String body, Type type) {
-
             JsonElement jsonElement = JsonParser.parseString(body);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.registerTypeAdapter(Task.class, new TaskAdapter());
-            gsonBuilder.registerTypeAdapter(EpicTask.class, new EpicAdapter());
-            gsonBuilder.registerTypeAdapter(SubTask.class, new SubtaskAdapter());
-            Gson gson = gsonBuilder.create();
             if(jsonObject.keySet().contains("id")) {
                 int id = jsonObject.get("id").getAsInt();
                 if (type != manager.getTaskById(id).getClass()) return null;
-                Task task = gson.fromJson(body, Task.class);
+                Task task = gson.fromJson(body, type);
                 task.setId(id);
                 manager.updateTask(task);
                 //вернём изменённую задачу
-                return gson.toJson(task);
+                return gson.toJson(manager.getTaskById(id));
             } else {
                 if (Task.class.equals(type)) {
                     Task task = gson.fromJson(body, Task.class);
@@ -241,8 +228,6 @@ public class HttpTaskServer {
             }
             return null;
         }
-
-
 
         private Type getType(String type) {
             if(type.equals(types.get(0))) return EpicTask.class;

@@ -20,10 +20,10 @@ public class SubtaskAdapter extends TypeAdapter<SubTask> {
         jsonWriter.value(task.getId());
         jsonWriter.name("name");
         jsonWriter.value(task.getName());
-        jsonWriter.name("status");
-        jsonWriter.value(task.getStatus().toString());
         jsonWriter.name("description");
         jsonWriter.value(task.getDescription());
+        jsonWriter.name("status");
+        jsonWriter.value(task.getStatus().toString());
         jsonWriter.name("startTime");
         jsonWriter.value(task.getStartTime().format(Task.getDATE_TIME_FORMATTER()));
         jsonWriter.name("duration");
@@ -41,7 +41,7 @@ public class SubtaskAdapter extends TypeAdapter<SubTask> {
         LocalDateTime startTime = null;
         Duration duration = null;
         int epicID = -1;
-        Status status = Status.IN_PROGRESS;
+        Status status = Status.NEW;
         while (jsonReader.hasNext()) {
             String field = jsonReader.nextName();
             if (field.equals("name")) {
@@ -61,7 +61,6 @@ public class SubtaskAdapter extends TypeAdapter<SubTask> {
             }
         }
         jsonReader.endObject();
-        EpicTask epic = new EpicTask("","");
         return new SubTask(name,description, status, startTime, duration, epicID);
     }
 }

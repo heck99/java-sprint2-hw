@@ -23,7 +23,7 @@ public class KVTaskClient {
             API_KEY = response.body();
             System.out.println(API_KEY);
         } catch (IOException | InterruptedException exception) {
-            System.out.println("о время выполнения запроса возникла ошибка. Проверьте, пожалуйста, URL-адрес и повторите попытку.");
+            System.out.println("Dо время выполнения запроса возникла ошибка. Проверьте, пожалуйста, URL-адрес и повторите попытку.");
         } catch (IllegalArgumentException exception) {
             System.out.println("Введённый вами адрес не соответствует формату URL. Попробуйте, пожалуйста, снова.");
         }

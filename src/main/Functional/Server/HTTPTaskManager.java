@@ -9,9 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +17,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
 
     public HTTPTaskManager(String path) {
     super();
-    client = new KVTaskClient("http://localhost:8078");
+    client = new KVTaskClient(path);
     load();
     }
 
@@ -36,8 +33,9 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         }
 
         Gson gson = new GsonBuilder().registerTypeAdapter(SubTask.class, new SubtaskAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new DateFormatter())
+                .registerTypeAdapter(Task.class, new TaskAdapter())
+                .registerTypeAdapter(EpicTask.class, new EpicAdapter())
+                .registerTypeAdapter(SubTask.class, new SubtaskAdapter())
                 .create();
         client.put("epic", gson.toJson(epics));
         client.put("task", gson.toJson(tasks));
@@ -51,8 +49,6 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         List<SubTask> subTasks;
 
         Gson gson = new GsonBuilder().registerTypeAdapter(SubTask.class, new SubtaskAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new DateFormatter())
                 .registerTypeAdapter(Task.class, new TaskAdapter())
                 .registerTypeAdapter(EpicTask.class, new EpicAdapter())
                 .registerTypeAdapter(SubTask.class, new SubtaskAdapter())
