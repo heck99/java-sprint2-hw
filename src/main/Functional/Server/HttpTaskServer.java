@@ -57,81 +57,85 @@ public class HttpTaskServer {
     }
 
     private static class TaskHandler implements HttpHandler {
-        private static List<String> types = Arrays.asList("epic", "task", "subtask");
-
 
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
 
             String method = httpExchange.getRequestMethod();
             String response = null;
-            String path = httpExchange.getRequestURI().getPath();
-            String[] fields = path.split("/");
+            String path = httpExchange.getRequestURI().getPath().substring(6);
             Headers headers = httpExchange.getResponseHeaders();
             headers.set("Content-Type", "application/json");
             switch(method) {
                 case "POST":
-                    response = getResponsePostTask(manager, new String(httpExchange.getRequestBody().readAllBytes(),
-                            DEFAULT_CHARSET), getType(fields[2]));
-                    setStatus(httpExchange, response);
+                    String body = new String(httpExchange.getRequestBody().readAllBytes(), DEFAULT_CHARSET);
+                    switch (path) {
+                        case "/task":
+                            response = getResponsePostTask(manager, body, Task.class);
+                            break;
+                        case "/epic":
+                            response = getResponsePostTask(manager, body, EpicTask.class);
+                            break;
+                        case "/subtask":
+                            response = getResponsePostTask(manager, body, SubTask.class);
+                            break;
+                    }
                     break;
                 case "GET":
-                    /*запрос на получение списка всех задач
-                    не уверен, что правильно понял, но в данный момен у меня можно получить список всех задач по 3ёмэндпоинтам:
-                    http://loclgost:8080/tasks/task
-                    http://loclgost:8080/tasks/epic
-                    http://loclgost:8080/tasks/subtasks*/
-                    if(fields.length == 3 && httpExchange.getRequestURI().getQuery() == null && types.contains(fields[2])) {
-                        response = getResponseGetTaskList(manager);
-                        setStatus(httpExchange, response);
-                    } else if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
-                        //запрос на получение задачи по id сразу 3 endpoint для всех типов завач
-                        String id = httpExchange.getRequestURI().getQuery();
-                        response = getResponseGetTaskById(manager, Integer.parseInt(id.split("=")[1]), getType(fields[2]));
-                        setStatus(httpExchange, response);
-                    } else
-                    //запрос на получение сабтаски эпика по id эпика
-                    if(fields.length == 4 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
-                        String id = httpExchange.getRequestURI().getQuery();
-                        if(!fields[2].equals(types.get(2))) break;
-                        if (!fields[3].equals(types.get(0)) ) break;
-                        response = getResponseGetEpicsSubtaskList(manager, Integer.parseInt(id.split("=")[1]));
-                        setStatus(httpExchange, response);
-                    } else
-                    //запрос на получение истории
-                    if(fields.length == 3 && fields[2].equals("history")) {
-                        response = getResponseGetHistory(manager);
-                        setStatus(httpExchange, response);
-                    } else
-                    //запрос на получение  упорядоченого списка задач
-                    if(fields.length == 2) {
-                        response = getResponseGetPrioritizedTasks(manager);
-                        setStatus(httpExchange, response);
+                    if(httpExchange.getRequestURI().getQuery() == null) {
+                        switch (path) {
+                            case "/task":
+                            case "/epic":
+                            case "/subtask":
+                                response = getResponseGetTaskList(manager);
+                                break;
+                            case "/history":
+                                response = getResponseGetHistory(manager);
+                                break;
+                            case "":
+                                response = getResponseGetPrioritizedTasks(manager);
+                                break;
+                        }
                     } else {
-                       setStatus(httpExchange, null);
+                        int id = Integer.parseInt(httpExchange.getRequestURI().getQuery().substring(3));
+                        switch (path) {
+                            case "/task":
+                                response = getResponseGetTaskById(manager, id, Task.class);
+                                break;
+                            case "/epic":
+                                response = getResponseGetTaskById(manager, id, EpicTask.class);
+                                break;
+                            case "/subtask":
+                                response = getResponseGetTaskById(manager, id, SubTask.class);
+                                break;
+                            case "/subtask/epic":
+                                response = getResponseGetEpicsSubtaskList(manager, id);
+                                break;
+                        }
                     }
                     break;
-
                 case "DELETE":
-                    //запрос на удаление всех задач
-                    if(fields.length == 3 && httpExchange.getRequestURI().getQuery() == null && types.contains(fields[2])) {
 
+                    if(httpExchange.getRequestURI().getQuery() == null) {
                         manager.deleteAllTask();
                         response = "Все задачи удалены";
-                        setStatus(httpExchange, response);
+                    } else {
+                        int id = Integer.parseInt(httpExchange.getRequestURI().getQuery().substring(3));
+                        switch (path) {
+                            case "/task" :
+                                response = getResponseDeleteTaskById(manager, id, Task.class);
+                                break;
+                            case "/epic" :
+                                response = getResponseDeleteTaskById(manager, id, EpicTask.class);
+                                break;
+                            case "/subtask" :
+                                response = getResponseDeleteTaskById(manager, id, SubTask.class);
+                                break;
+                        }
                     }
-                    //запрос на удаление задачи по id
-                    if(fields.length == 3 && httpExchange.getRequestURI().getQuery() != null && types.contains(fields[2])) {
-                        String id = httpExchange.getRequestURI().getQuery();
-                        response = getResponseDeleteTaskById(manager, Integer.parseInt(id.split("=")[1]), getType(fields[2]));
-                        setStatus(httpExchange, response);
-                    }
-
                     break;
-                default:
-                    setStatus(httpExchange, null);
             }
-
+            setStatus(httpExchange, response);
             try (OutputStream os = httpExchange.getResponseBody()) {
                 if(response != null) {
                     os.write(response.getBytes());
@@ -228,13 +232,5 @@ public class HttpTaskServer {
             }
             return null;
         }
-
-        private Type getType(String type) {
-            if(type.equals(types.get(0))) return EpicTask.class;
-            if(type.equals(types.get(1)))  return Task.class;
-            if(type.equals(types.get(2)))  return SubTask.class;
-            return null;
-        }
-
     }
 }

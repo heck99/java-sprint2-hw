@@ -660,7 +660,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void shouldReternFirstTaskBeforeSecond() throws IOException, InterruptedException {
+    public void shouldReturnFirstTaskBeforeSecond() throws IOException, InterruptedException {
         Task task = getTask();
         task.setId(0);
         Task second = getTask();
@@ -694,7 +694,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    public void shouldReternSecondBeforeFirst() throws IOException, InterruptedException {
+    public void shouldReturnSecondBeforeFirst() throws IOException, InterruptedException {
         Task task = getTask();
         task.setId(0);
         Task second = getTask();
