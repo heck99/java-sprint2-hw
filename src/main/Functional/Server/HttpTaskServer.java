@@ -71,7 +71,6 @@ public class HttpTaskServer {
             headers.set("Content-Type", "application/json");
             switch(method) {
                 case "POST":
-
                     response = getResponsePostTask(manager, new String(httpExchange.getRequestBody().readAllBytes(),
                             DEFAULT_CHARSET), getType(fields[2]));
                     setStatus(httpExchange, response);
@@ -116,6 +115,7 @@ public class HttpTaskServer {
                 case "DELETE":
                     //запрос на удаление всех задач
                     if(fields.length == 3 && httpExchange.getRequestURI().getQuery() == null && types.contains(fields[2])) {
+
                         manager.deleteAllTask();
                         response = "Все задачи удалены";
                         setStatus(httpExchange, response);

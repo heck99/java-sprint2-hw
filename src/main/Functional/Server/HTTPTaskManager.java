@@ -16,9 +16,9 @@ public class HTTPTaskManager extends FileBackedTasksManager {
     KVTaskClient client;
 
     public HTTPTaskManager(String path) {
-    super();
-    client = new KVTaskClient(path);
-    load();
+        super();
+        client = new KVTaskClient(path);
+        load();
     }
 
     @Override
@@ -27,11 +27,16 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         List<EpicTask> epics = new ArrayList<>();
         List<SubTask> subTasks = new ArrayList<>();
         for (Task task : getTaskList()) {
-            if(task.getClass().equals(Task.class)) tasks.add(task);
-            if(task.getClass().equals(EpicTask.class)) epics.add((EpicTask) task);
-            if(task.getClass().equals(SubTask.class)) subTasks.add((SubTask) task);
+            if(task.getClass().equals(Task.class)) {
+                tasks.add(task);
+            }
+            if(task.getClass().equals(EpicTask.class)) {
+                epics.add((EpicTask) task);
+            }
+            if(task.getClass().equals(SubTask.class)) {
+                subTasks.add((SubTask) task);
+            }
         }
-
         Gson gson = new GsonBuilder().registerTypeAdapter(SubTask.class, new SubtaskAdapter())
                 .registerTypeAdapter(Task.class, new TaskAdapter())
                 .registerTypeAdapter(EpicTask.class, new EpicAdapter())
@@ -43,12 +48,10 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         System.out.println(gson.toJson(tasks));
     }
 
-
-    protected void load() {
+    private void load() {
         List<Task> tasks;
         List<EpicTask> epics ;
         List<SubTask> subTasks;
-
         Gson gson = new GsonBuilder().registerTypeAdapter(SubTask.class, new SubtaskAdapter())
                 .registerTypeAdapter(Task.class, new TaskAdapter())
                 .registerTypeAdapter(EpicTask.class, new EpicAdapter())
@@ -60,19 +63,14 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         if(tasks != null) {
             tasks.forEach(this::addTask);
         }
-
         if(epics != null) {
             epics.forEach(this::addTask);
         }
-
-
-
         if(subTasks != null) {
             for(SubTask task : subTasks) {
                 task.setEpicTask(getEpicById(task.getEpicId()));
             }
             subTasks.forEach(this::addTask);
         }
-
     }
 }
